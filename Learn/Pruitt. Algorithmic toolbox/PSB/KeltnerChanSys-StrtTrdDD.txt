@@ -1,0 +1,22 @@
+Start Trade Drawdown Analysis Of :  KeltnerChanSys : Max. ClsTrd Draw Down     143101
+-------------------------------------
+Probability of DD <     7155 is 0.022
+Probability of DD <    14310 is 0.033
+Probability of DD <    21466 is 0.036
+Probability of DD <    28623 is 0.065
+Probability of DD <    35781 is 0.202
+Probability of DD <    42940 is 0.207
+Probability of DD <    50100 is 0.224
+Probability of DD <    57261 is 0.239
+Probability of DD <    64423 is 0.317
+Probability of DD <    71586 is 0.326
+Probability of DD <    78750 is 0.331
+Probability of DD <    85915 is 0.334
+Probability of DD <    93081 is 0.354
+Probability of DD <   100249 is 0.360
+Probability of DD <   107417 is 0.366
+Probability of DD <   114586 is 0.438
+Probability of DD <   121756 is 0.441
+Probability of DD <   128927 is 0.458
+Probability of DD <   136099 is 0.464
+Probability of DD <   143272 is 1.000

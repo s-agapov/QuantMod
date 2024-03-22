@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(IDPmisc)\nlibrary(riskParityPortfolio)\nlibrary(fPortfolio)\nlibrary(xts)\n\n# load FAANG returns\n# data available at https://github.com/souzatharsis/open-quant-live-book\nfaang.returns<-as.xts(read.zoo('FAANG.csv',\n                               header=TRUE,\n                               index.column=1, sep=\",\"))\n\n# consider returns from 2018\n# omit days with missing data (INF/NA returns)\nfaang.returns.filtered <- NaRV.omit(as.matrix(faang.returns[\"2018\"]))\n\n# calculate covariance matrix\nSigma <- cov(faang.returns.filtered)\n\n# compute risk parity portfolio\nportfolio.parity <- riskParityPortfolio(Sigma)\n\n# compute tangency portfolio\nportfolio.tangency <- tangencyPortfolio(as.timeSeries(faang.returns.filtered), \n                                        constraints = \"LongOnly\")\nportfolio.weights <- rbind(portfolio.parity$w, getWeights(portfolio.tangency))\nrow.names(portfolio.weights)<-c(\"Parity Portfolio\", \"Tangency Portfolio\")\n\n\nfaang.returns.xts<-faang.returns[\"2014-01-01/2019-09-01\"]\nrWindows<-rollingWindows(faang.returns.xts, period=\"12m\",\n                         by=\"3m\")\n\n# Apply FUN to time-series R in the subset [from, to].\nApplyFilter <- function(from, to, R, FUN){\n  return(FUN(R[paste0(from, \"/\", to)]))\n}\n# For each pair (from, to) ApplyFilter to time-series R using FUN\nApplyRolling <- function(from, to, R, FUN){\n  library(purrr)\n  return(map2(from, to, ApplyFilter, R=R, FUN=FUN))\n}\n# Returns weights of a risk parity portfolio from covariance matrix of matrix of returns r\nCalculateRiskParity <- function(r){\n  library(riskParityPortfolio)\n  return(riskParityPortfolio(cov(r))$w)\n}\n# Given a matrix of returns `r`,\n# calculates risk parity weights for each date in `to` considering a time window from `from` and `to` \nRollingRiskParity <- function(from, to, r){\n  library(rlist)\n  p<-ApplyRolling(from, to, r, CalculateRiskParity)\n  names(p)<-to\n  return(list.rbind(p))\n}\n\nparity.weights<-RollingRiskParity(rWindows$from@Data, rWindows$to@Data, faang.returns.xts)\n\n\n\nfaang.returns.ts<-as.timeSeries(faang.returns.xts)\nSpec = portfolioSpec()\n\nrolling.portfolio.tangency <- rollingTangencyPortfolio(faang.returns.ts,\n                                                       constraints = \"LongOnly\",\n                                                       from=rWindows$from,\n                                                       to=rWindows$to,\n                                                       spec=Spec)\n\nnames(rolling.portfolio.tangency)<-rWindows$to\ntan.weights <- sapply(rolling.portfolio.tangency,getWeights)\nrownames(tan.weights) <- colnames(faang.returns.ts)\ntan.weights<-t(tan.weights)\n\nlibrary(PerformanceAnalytics)\ntan.returns <- Return.portfolio(faang.returns.xts, weights=tan.weights,verbose=TRUE)\nparity.returns <- Return.portfolio(faang.returns.xts, weights=parity.weights,verbose=TRUE)\np.returns<-merge(tan.returns$returns, parity.returns$returns)\nnames(p.returns)<-c(\"FAANG Tangency Index\", \"FAANG Parity Index\")\n\nplot(cumsum(p.returns))\n",
+    "created" : 1598414905590.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "921211096",
+    "id" : "7E18A86",
+    "lastKnownWriteTime" : 1597256722,
+    "last_content_update" : 1597256722,
+    "path" : "G:/Code/Projects/QuantMod/tp/Shares/RiskParityPortfolio.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

@@ -1,0 +1,22 @@
+Start Trade Drawdown Analysis Of :     StochSystem : Max. ClsTrd Draw Down       4387
+-------------------------------------
+Probability of DD <      599 is 0.067
+Probability of DD <      798 is 0.067
+Probability of DD <      999 is 0.067
+Probability of DD <     1200 is 0.067
+Probability of DD <     1402 is 0.067
+Probability of DD <     1606 is 0.067
+Probability of DD <     1810 is 0.067
+Probability of DD <     2016 is 0.133
+Probability of DD <     2222 is 0.133
+Probability of DD <     2429 is 0.133
+Probability of DD <     2638 is 0.133
+Probability of DD <     2847 is 0.133
+Probability of DD <     3057 is 0.133
+Probability of DD <     3269 is 0.133
+Probability of DD <     3481 is 0.133
+Probability of DD <     3695 is 0.133
+Probability of DD <     3909 is 0.467
+Probability of DD <     4124 is 0.467
+Probability of DD <     4341 is 0.467
+Probability of DD <     4558 is 1.000

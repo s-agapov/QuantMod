@@ -1,0 +1,20 @@
+{
+    "collab_server" : "",
+    "contents" : "library(ggplot2)\nlibrary(quantmod)\nlibrary(forecast)\n\ngetSymbols(\"GE\")\ngetSymbols(\"NFLX\")\nseries = NFLX\n\n\nxx = series['2017']\nautoplot(xx[,1:4])\nggAcf(xx[,3])\n ",
+    "created" : 1505120798042.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3112193757",
+    "id" : "DD881829",
+    "lastKnownWriteTime" : 1502560468,
+    "last_content_update" : 1505120814372,
+    "path" : "G:/Code/Projects/Quant Mod/R/Quantmod.R",
+    "project_path" : null,
+    "properties" : {
+    },
+    "relative_order" : 2,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

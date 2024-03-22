@@ -1,0 +1,22 @@
+Start Trade Drawdown Analysis Of :    BBSysWFilter : Max. ClsTrd Draw Down      61998
+-------------------------------------
+Probability of DD <     3099 is 0.032
+Probability of DD <     6199 is 0.035
+Probability of DD <     9300 is 0.069
+Probability of DD <    12402 is 0.076
+Probability of DD <    15505 is 0.168
+Probability of DD <    18609 is 0.170
+Probability of DD <    21714 is 0.173
+Probability of DD <    24820 is 0.180
+Probability of DD <    27927 is 0.187
+Probability of DD <    31035 is 0.209
+Probability of DD <    34144 is 0.213
+Probability of DD <    37254 is 0.232
+Probability of DD <    40364 is 0.238
+Probability of DD <    43476 is 0.243
+Probability of DD <    46589 is 0.247
+Probability of DD <    49703 is 0.250
+Probability of DD <    52818 is 0.253
+Probability of DD <    55934 is 0.256
+Probability of DD <    59051 is 0.810
+Probability of DD <    62169 is 1.000

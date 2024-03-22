@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "data_path = \"G:/Datasets/Ruppert\"\ndata_file = \"Stock_Bond.csv\"\ndf = read.csv(paste0(data_path,\"/\",data_file), header = TRUE)\nhead(df)\n\nn = dim(df)[1]\ndf[\"GM_AC\"]\nattach(df)\nGMReturn = GM_AC[-1]/GM_AC[-n] - 1\nFReturn = F_AC[-1]/F_AC[-n] - 1\npar(mfrow = c(1, 1))\nplot(GMReturn,FReturn)\nlogGM = log(GMReturn + 1)\nlogF = log(FReturn + 1)\n\nplot(logGM, GMReturn)\ncor(logGM, GMReturn)\n\nMSFT_ret = MSFT_AC[-1]/MSFT_AC[-n] - 1\nMRK_ret = MRK_AC[-1]/MRK_AC[-n] - 1\n\nplot(MSFT_ret, MRK_ret)\ncor(MSFT_ret, MRK_ret)\ncor(GMReturn, FReturn)\n\nniter = 1e5\nbelow = rep(0, niter)\nabove = rep(0, niter)\nsells = rep(0, niter)\nset.seed(2009)\n\nmu = 0.05\ns = 0.23\n\nfor (i in 1:niter) {\n  r = rnorm(100, mean = mu/253, sd = s/sqrt(253))\n  logPrice = log(1e6) + cumsum(r)\n\n  maxlogP = max(logPrice)\n  maxDay = which.min(logPrice)\n  minlogP = min(logPrice)\n  minDay = which.min(logPrice)\n\n  rule1 = minlogP > log(950000)\n  rule2 = minlogP < log(950000) & maxlogP > log(1100000)\n  \n  rule3 = maxDay < minDay\n  rule = rule1 | rule2 & rule3\n  above[i] = as.numeric((maxlogP > log(1100000)) & rule)\n  if (above[i]) {\n    sells[i] = maxDay\n  }\n    \n  rule1 = maxlogP < log(1100000)\n  rule2 = minlogP < log(950000) & maxlogP > log(1100000)\n  rule3 = maxDay > minDay\n  rule = rule1 | rule2 & rule3\n  \n  below[i] = as.numeric((minlogP < log(950000)) & rule)\n  if (below[i]) {\n    sells[i] = maxDay\n  }\n  \n}\n\nm_s = mean(sells)\nm_a = mean(above)\nm_b = mean(below)\nE = m_a * 100000 + m_b * (-50000)\n\n",
+    "created" : 1598067447799.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "3802185398",
+    "id" : "C0D1DA8A",
+    "lastKnownWriteTime" : 1598084184,
+    "last_content_update" : 1598084184775,
+    "path" : "G:/Code/Projects/Quant Mod/Ruppert/Ch_2.R",
+    "project_path" : "Ch_2.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

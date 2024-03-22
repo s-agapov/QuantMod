@@ -1,0 +1,17 @@
+CUDA
+CuDNN
+PyTorch
+Tensotflow
+talib
+python pandas
+python scipy
+
+Jupyter lab
+R
+RStudio server
+#for packages
+libcurl4-openssl-dev 
+
+circus
+gekko https://github.com/askmike/gekko
+gdrive https://github.com/prasmussen/gdrive#downloads

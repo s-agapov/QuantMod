@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "library(quantmod)\ngetSymbols(\"GE\", from = \"2000-1-1\", to=\"2009-12-30\")\nGE[\"2000-01-01/2000-01-20\"]\ngeAdj = GE$GE.Adjusted[\"2000-01-01/2000-01-20\"]\nmax(geAdj); min(geAdj); mean(geAdj)\nsummary(geAdj)\nchartSeries(GE)\nchartSeries(GE,TA=NULL,subset=\"2001-01::2001-02\")\nsaveRDS(GE,file=\"GE.rds\")\n",
+    "created" : 1505120674497.000,
+    "dirty" : true,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "59940993",
+    "id" : "A1F6766B",
+    "lastKnownWriteTime" : 1505120689,
+    "last_content_update" : 1505121137315,
+    "path" : "G:/Code/Projects/Quant Mod/Arratia. Conputational Finance/Chapter 1.R",
+    "project_path" : "Chapter 1.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

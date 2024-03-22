@@ -1,0 +1,2 @@
+state,market,tf,contract,MP,OP,num_shares,robot,p1,p2,p3,p4,p5,verbose
+1,LEND-BTC,5m,100,0,0,0,ma_2_crossover,61,160,0,0,0,2

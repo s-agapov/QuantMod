@@ -1,0 +1,21 @@
+{
+    "collab_server" : "",
+    "contents" : "library(fBasics)\n\nda=read.table(\"d-ibm3dx7008.txt\",header=T) \ndim(da)\nda[1,]\nibm = da[,2]\nsibm = ibm*100\nbasicStats(sibm)\n\nda=read.table(\"d-3stocks9908.txt\",header=T) \nhead(da)\nda[,2:4] *100\ndap = da\ndap[,2:4] = dap[,2:4] * 100\ndap\nbasicStats(da)\ndalr = log(da[,2:4] + 1)\ndalr\nbasicStats(dalr)\nt.test(dalr[,1])\n\n\n# Ex 2 --------------------------------------------------------------------\n\nda=read.table(\"m-gm3dx7508.txt\",header=T) \nhead(da)\nda[,2:4] * 100\ndap = da\ndap[,2:4] = dap[,2:4] * 100\nbasicStats(dap)\ndalr = log(da[,2:4] + 1)\ndalr\nbasicStats(dalr)\n\nt.test(dalr[,3])\n\n\n# Ex 3 --------------------------------------------------------------------\n\nda=read.table(\"m-gm3dx7508.txt\",header=T) \nsp = da[,4]\nprod(sp+1)\nsp = ts(da[,4], frequency = 12)\nsp_year = aggregate(sp, nfrequency = 1, FUN =function(x) {prod(1+x)} )\n\nexp(mean(log(1+sp_year)))-1\n\n\n# Ex 4 ------------------------------------------------------------------\n\n\n",
+    "created" : 1517296374821.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "965946711",
+    "id" : "A688DBA4",
+    "lastKnownWriteTime" : 1518171198,
+    "last_content_update" : 1518171198902,
+    "path" : "G:/Code/Projects/Quant Mod/Tsay. Analisys of financial time series/1.R",
+    "project_path" : "1.R",
+    "properties" : {
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

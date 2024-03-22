@@ -1,0 +1,22 @@
+Start Trade Drawdown Analysis Of :     BollBandSys 
+-------------------------------------
+Probability of DD <     6908 is 0.101
+Probability of DD <    10717 is 0.110
+Probability of DD <    14526 is 0.165
+Probability of DD <    18337 is 0.202
+Probability of DD <    22148 is 0.211
+Probability of DD <    25961 is 0.229
+Probability of DD <    29774 is 0.303
+Probability of DD <    33589 is 0.312
+Probability of DD <    37404 is 0.321
+Probability of DD <    41221 is 0.330
+Probability of DD <    45038 is 0.358
+Probability of DD <    48857 is 0.367
+Probability of DD <    52676 is 0.394
+Probability of DD <    56497 is 0.431
+Probability of DD <    60318 is 0.440
+Probability of DD <    64141 is 0.450
+Probability of DD <    67964 is 0.459
+Probability of DD <    71789 is 0.477
+Probability of DD <    75614 is 0.486
+Probability of DD <    79441 is 1.000

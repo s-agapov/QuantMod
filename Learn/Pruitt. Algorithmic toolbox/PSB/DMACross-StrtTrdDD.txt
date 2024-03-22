@@ -1,0 +1,22 @@
+Start Trade Drawdown Analysis Of :        DMACross : Max. ClsTrd Draw Down     344629
+-------------------------------------
+Probability of DD <    18706 is 0.035
+Probability of DD <    35860 is 0.050
+Probability of DD <    53015 is 0.115
+Probability of DD <    70171 is 0.130
+Probability of DD <    87328 is 0.213
+Probability of DD <   104486 is 0.227
+Probability of DD <   121644 is 0.245
+Probability of DD <   138804 is 0.266
+Probability of DD <   155965 is 0.304
+Probability of DD <   173127 is 0.397
+Probability of DD <   190290 is 0.409
+Probability of DD <   207454 is 0.413
+Probability of DD <   224618 is 0.416
+Probability of DD <   241784 is 0.435
+Probability of DD <   258951 is 0.450
+Probability of DD <   276119 is 0.489
+Probability of DD <   293288 is 0.491
+Probability of DD <   310458 is 0.625
+Probability of DD <   327628 is 0.975
+Probability of DD <   344800 is 1.000

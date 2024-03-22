@@ -1,0 +1,2 @@
+robot,market,tf,stop
+ma_crossover_01,ONT-BTC,3m,0

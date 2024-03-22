@@ -1,0 +1,22 @@
+Start Trade Drawdown Analysis Of :        TripleMA 
+-------------------------------------
+Probability of DD <    15389 is 0.014
+Probability of DD <    29669 is 0.019
+Probability of DD <    43950 is 0.019
+Probability of DD <    58232 is 0.023
+Probability of DD <    72515 is 0.040
+Probability of DD <    86799 is 0.042
+Probability of DD <   101083 is 0.059
+Probability of DD <   115369 is 0.082
+Probability of DD <   129656 is 0.094
+Probability of DD <   143944 is 0.099
+Probability of DD <   158233 is 0.136
+Probability of DD <   172523 is 0.150
+Probability of DD <   186813 is 0.171
+Probability of DD <   201105 is 0.185
+Probability of DD <   215398 is 0.204
+Probability of DD <   229692 is 0.214
+Probability of DD <   243987 is 0.216
+Probability of DD <   258283 is 0.230
+Probability of DD <   272580 is 0.359
+Probability of DD <   286877 is 1.000

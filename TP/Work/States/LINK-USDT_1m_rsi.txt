@@ -1,0 +1,2 @@
+state,market,tf,contract,MP,OP,num_shares,robot,p1,p2,p3,p4,p5,verbose
+1,LINK-USDT,1m,40,1,151.889832,40,rsi,14,49,51,0,0,2

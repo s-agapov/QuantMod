@@ -1,0 +1,4 @@
+state,market,tf,contract,MP,robot,p1,p2,p3,p4,p5,verbose
+0,LINK-USDT,1m,10,0,rsi,14,49,51,0,0,2
+0,LINK-USDT,5m,10,0,rsi,15,49,51,0,0,2
+1,LINK-BTC,5m,10,0,rsi,15,49,51,0,0,2

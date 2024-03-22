@@ -1,0 +1,22 @@
+Start Trade Drawdown Analysis Of :  KeltChanStocks : Max. ClsTrd Draw Down      22302
+-------------------------------------
+Probability of DD <     1115 is 0.033
+Probability of DD <     2230 is 0.033
+Probability of DD <     3346 is 0.037
+Probability of DD <     4463 is 0.051
+Probability of DD <     5581 is 0.051
+Probability of DD <     6700 is 0.075
+Probability of DD <     7820 is 0.079
+Probability of DD <     8941 is 0.084
+Probability of DD <    10063 is 0.233
+Probability of DD <    11187 is 0.242
+Probability of DD <    12311 is 0.242
+Probability of DD <    13436 is 0.242
+Probability of DD <    14562 is 0.249
+Probability of DD <    15689 is 0.286
+Probability of DD <    16817 is 0.291
+Probability of DD <    17946 is 0.315
+Probability of DD <    19076 is 0.319
+Probability of DD <    20207 is 0.355
+Probability of DD <    21339 is 0.471
+Probability of DD <    22473 is 1.000

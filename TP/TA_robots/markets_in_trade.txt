@@ -1,0 +1,5 @@
+market,tf,stop
+BTC-USDT,1m,0
+BTC-USDT,1h,0
+LINK-USDT,1m,1
+LINK-USDT,3m,0

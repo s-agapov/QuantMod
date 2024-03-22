@@ -1,0 +1,22 @@
+Start Trade Drawdown Analysis Of :      MACDSystem : Max. ClsTrd Draw Down      72618
+-------------------------------------
+Probability of DD <     3725 is 0.017
+Probability of DD <     7351 is 0.024
+Probability of DD <    10978 is 0.038
+Probability of DD <    14606 is 0.042
+Probability of DD <    18235 is 0.045
+Probability of DD <    21865 is 0.062
+Probability of DD <    25496 is 0.067
+Probability of DD <    29128 is 0.073
+Probability of DD <    32761 is 0.076
+Probability of DD <    36395 is 0.085
+Probability of DD <    40030 is 0.124
+Probability of DD <    43666 is 0.150
+Probability of DD <    47302 is 0.151
+Probability of DD <    50940 is 0.648
+Probability of DD <    54579 is 0.657
+Probability of DD <    58219 is 0.762
+Probability of DD <    61860 is 0.771
+Probability of DD <    65502 is 0.774
+Probability of DD <    69145 is 0.998
+Probability of DD <    72789 is 1.000

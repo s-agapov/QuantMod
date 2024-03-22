@@ -1,0 +1,22 @@
+Start Trade Drawdown Analysis Of :       XavgCross : Max. ClsTrd Draw Down     168248
+-------------------------------------
+Probability of DD <     8412 is 0.029
+Probability of DD <    16824 is 0.094
+Probability of DD <    25238 is 0.109
+Probability of DD <    33652 is 0.132
+Probability of DD <    42068 is 0.151
+Probability of DD <    50484 is 0.162
+Probability of DD <    58901 is 0.237
+Probability of DD <    67320 is 0.304
+Probability of DD <    75739 is 0.739
+Probability of DD <    84160 is 0.758
+Probability of DD <    92581 is 0.777
+Probability of DD <   101003 is 0.857
+Probability of DD <   109427 is 0.871
+Probability of DD <   117851 is 0.884
+Probability of DD <   126277 is 0.902
+Probability of DD <   134703 is 0.965
+Probability of DD <   143131 is 0.968
+Probability of DD <   151559 is 0.987
+Probability of DD <   159988 is 0.991
+Probability of DD <   168419 is 1.000

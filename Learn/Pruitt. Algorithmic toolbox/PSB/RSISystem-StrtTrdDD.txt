@@ -1,0 +1,22 @@
+Start Trade Drawdown Analysis Of :       RSISystem : Max. ClsTrd Draw Down     118322
+-------------------------------------
+Probability of DD <     7317 is 0.013
+Probability of DD <    13159 is 0.019
+Probability of DD <    19003 is 0.022
+Probability of DD <    24847 is 0.285
+Probability of DD <    30692 is 0.308
+Probability of DD <    36539 is 0.311
+Probability of DD <    42386 is 0.378
+Probability of DD <    48235 is 0.391
+Probability of DD <    54084 is 0.497
+Probability of DD <    59934 is 0.513
+Probability of DD <    65786 is 0.535
+Probability of DD <    71638 is 0.542
+Probability of DD <    77491 is 0.545
+Probability of DD <    83346 is 0.545
+Probability of DD <    89201 is 0.554
+Probability of DD <    95058 is 0.564
+Probability of DD <   100915 is 0.587
+Probability of DD <   106773 is 0.904
+Probability of DD <   112633 is 0.917
+Probability of DD <   118493 is 1.000
