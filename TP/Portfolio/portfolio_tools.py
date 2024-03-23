@@ -37,13 +37,13 @@ def load_data_for_portfolio(tickers, tf, verbose = True):
 
 def weights_to_df(cleaned_weights):
     dfw = pd.DataFrame.from_dict([cleaned_weights]).transpose()
-    dfw.columns = ['W']
-    dfw = dfw[dfw['W'] > 0]
+    dfw.columns = ['weigths']
+    dfw = dfw[dfw['weights'] > 0]
     return dfw
 
-def final_sums(df, total):
+def final_sums(df, total, filt):
     xx = round(df * total, -1)
-    return xx[xx['W'] > 50]
+    return xx[xx['weights'] > filt]
 
 
 def calc_frontier(df_period, risk_method, ret_method = "mean_historical_return", span = 600):
@@ -80,7 +80,7 @@ def calc_weights(ef, opt_type, par, verbose = False):
     ef.portfolio_performance(verbose=verbose)
     cleaned_weights = ef.clean_weights(cutoff=0.001)
     dfw = weights_to_df(cleaned_weights)
-    dfw['weights'] = dfw['W']/dfw['W'].sum()
+    dfw['weights'] = dfw['weights']/dfw['weights'].sum()
     return dfw
 
 # buy 
