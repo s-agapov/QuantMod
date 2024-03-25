@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 
+from datetime import datetime
 
 from pypfopt.efficient_frontier import EfficientFrontier
 from pypfopt import risk_models
@@ -12,6 +13,10 @@ sys.path.append("..")
 from tp_utils.data_provider import read_data
 from tp_utils.tp_utils import create_market_sell_order
 
+def print_data(df):
+    print(datetime.fromtimestamp(df.index[0]/1000))
+    print(datetime.fromtimestamp(df.index[-1]/1000))
+    
 def load_data_for_portfolio(tickers, tf, verbose = True):
     res = []
     for ticker in tickers:
@@ -37,7 +42,7 @@ def load_data_for_portfolio(tickers, tf, verbose = True):
 
 def weights_to_df(cleaned_weights):
     dfw = pd.DataFrame.from_dict([cleaned_weights]).transpose()
-    dfw.columns = ['weigths']
+    dfw.columns = ['weights']
     dfw = dfw[dfw['weights'] > 0]
     return dfw
 
