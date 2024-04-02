@@ -10,6 +10,9 @@ from tinkoff.invest.caching.market_data_cache.cache_settings import (
     MarketDataCacheSettings,
 )
 
+import sys
+sys.path.append("..")
+from tp_config import *
 
 def get_accounts(token):
     with Client(token) as cl:
@@ -94,7 +97,7 @@ def money_value(price):
 def get_candles(token, figi, interval, days):
     res = []
     with Client(token) as client:
-        settings = MarketDataCacheSettings(base_cache_dir=Path("D:\Data\Tink\market_data_cache"))
+        settings = MarketDataCacheSettings(base_cache_dir=Path(TINK_DATA))
         market_data_cache = MarketDataCache(settings=settings, services=client)
         for candle in market_data_cache.get_all_candles(
             figi = figi,
