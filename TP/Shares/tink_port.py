@@ -43,17 +43,29 @@ def get_portfolio(token):
         port = cl.operations.get_portfolio(account_id=acc_id) 
     return port
 
+
+def get_asset_lot(figi, df):
+    dfx = df[df['figi'] == figi]   
+ 
+    if dfx.shape[0] > 0 :
+        res = dfx['lot'].iloc[0]      
+        return res
+    else :
+        return 1
+    
 def port_to_df(port, base):
 
     res = []
     for pos in port.positions:
         ticker = figi_to_ticker(pos.figi, base)
         name =  figi_to_name(pos.figi, base)
+        lot  = get_asset_lot(pos.figi, base)
         res.append({
             'figi': pos.figi,
             'ticker': ticker,
             'name': name,
             'quantity' : pos.quantity.units,
+            'lot_quantity' : int(pos.quantity.units/lot),
             'price' : money_value(pos.current_price)
         })
 
