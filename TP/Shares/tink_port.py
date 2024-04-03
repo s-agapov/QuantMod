@@ -14,6 +14,23 @@ import sys
 sys.path.append("..")
 from tp_config import *
 
+class TinkPortfolio:
+    def __init__(self, Client, token):
+        self.Client = Client
+        self.token = token
+        
+    def get_accounts(self):
+        with self.Client(self.token) as cl:
+            accounts = cl.users.get_accounts()
+        return accounts
+        
+    def get_portfolio(self):
+        accounts = self.get_accounts()
+        acc_id = accounts.accounts[0].id
+        with self.Client(self.token) as cl:
+            port = cl.operations.get_portfolio(account_id=acc_id) 
+        return port
+
 def get_accounts(token):
     with Client(token) as cl:
         accounts = cl.users.get_accounts()
