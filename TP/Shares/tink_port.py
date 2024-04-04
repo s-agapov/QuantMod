@@ -1,7 +1,7 @@
 import pandas as pd
 from pathlib import Path
 from datetime import timedelta
-
+import time
 
 from tinkoff.invest import CandleInterval, Client
 from tinkoff.invest.utils import now
@@ -128,14 +128,26 @@ def get_candles(token, figi, interval, days):
     with Client(token) as client:
         settings = MarketDataCacheSettings(base_cache_dir=Path(TINK_DATA))
         market_data_cache = MarketDataCache(settings=settings, services=client)
-        for candle in market_data_cache.get_all_candles(
-            figi = figi,
-            from_= now() - timedelta(days = days),
-            interval= interval,
-        ):
-            price_row = [candle.open,  candle.high, candle.low, candle.close]
-            price_row = [money_value(x) for x in price_row]
-            res.append([candle.time] + price_row)    
+        count = 0
+        rerun = True
+        while rerun:
+            try:
+                for candle in market_data_cache.get_all_candles(
+                    figi = figi,
+                    from_= now() - timedelta(days = days),
+                    interval= interval,
+                ):
+                    price_row = [candle.open,  candle.high, candle.low, candle.close]
+                    price_row = [money_value(x) for x in price_row]
+                    res.append([candle.time] + price_row)    
+                rerun = False
+            except:
+                count = count + 1
+                print("Ошибка связи")
+                tim.sleep(2)
+                if count == 4:
+                    rerun = False
+            
         return res       
     
 def get_open_price(candles):
