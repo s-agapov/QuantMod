@@ -124,7 +124,7 @@ if __name__ == "__main__":
     for ind, pos in base_ru.iterrows():
         time.sleep(1)
         print(pos.figi, pos.ticker)        
-        candles = tink.get_candles(token, pos.figi, CandleInterval.CANDLE_INTERVAL_DAY, 30)
+        candles = tink.get_candles(token, pos.figi, CandleInterval.CANDLE_INTERVAL_DAY, now(), 30)
         df =  tink.get_open_price(candles)
         ticker = tink.figi_to_ticker(pos.figi, base)
 

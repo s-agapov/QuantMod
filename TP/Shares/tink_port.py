@@ -1,6 +1,7 @@
 import pandas as pd
 from pathlib import Path
 from datetime import timedelta
+from datetime import datetime, timezone
 import time
 
 from tinkoff.invest import CandleInterval, Client
@@ -123,7 +124,7 @@ def figi_to_name(figi, df):
 def money_value(price):
     return price.units + price.nano / 1e9
 
-def get_candles(token, figi, interval, days):
+def get_candles(token, figi, interval, to_date, days):
     res = []
     with Client(token) as client:
         settings = MarketDataCacheSettings(base_cache_dir=Path(TINK_DATA))
@@ -134,7 +135,8 @@ def get_candles(token, figi, interval, days):
             try:
                 for candle in market_data_cache.get_all_candles(
                     figi = figi,
-                    from_= now() - timedelta(days = days),
+                    from_= to_date - timedelta(days = days),
+                    to   = to_date,
                     interval= interval,
                 ):
                     price_row = [candle.open,  candle.high, candle.low, candle.close]
@@ -160,3 +162,30 @@ def get_open_price(candles):
     df = df.set_index('date')
     
     return df
+
+def get_close_price(candles):
+    res = []
+    for row in candles:
+        sdate = row[0]
+        sdate = sdate.strftime("%Y-%m-%d")
+        res.append([sdate] + row[4:5]) 
+    df = pd.DataFrame(res, columns = ['date', 'ticker'])
+    df = df.set_index('date')    
+    return df
+
+def get_start_of_day(current_datetime):
+  """
+  Получить timestamp начала дня по datetime текущего момента.
+
+  Args:
+      datetime_timestamp: datetime.datetime.
+
+  Returns:
+      Datetime начала дня.
+  """
+
+  # Получение даты без времени
+  start_of_day_datetime = current_datetime.replace(hour=0, minute=0, second=0, microsecond=0)
+
+
+  return start_of_day_datetime
