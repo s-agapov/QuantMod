@@ -51,7 +51,7 @@ def final_sums(df, total, filt):
     return xx[xx['weights'] > filt]
 
 
-def calc_frontier(df_period, risk_method, ret_method = "mean_historical_return", span = 600):
+def calc_frontier(df_period, risk_method, ret_method = "mean_historical_return", span = 600, shorts = False):
 
     if ret_method == "ema_historical_return":
         mu = expected_returns.return_model(df_period, method=ret_method, span = span)
@@ -59,7 +59,13 @@ def calc_frontier(df_period, risk_method, ret_method = "mean_historical_return",
         mu = expected_returns.return_model(df_period, method=ret_method)
   
     cov_mat = risk_models.risk_matrix(df_period, method=risk_method)        
-    ef = EfficientFrontier(mu, cov_mat, solver = 'ECOS')
+    if shorts:
+        ef = EfficientFrontier(mu, cov_mat,
+                               solver = 'ECOS',
+                               weight_bounds = (-1, 1))
+    else:
+        ef = EfficientFrontier(mu, cov_mat,
+                               solver = 'ECOS')
     return ef
 
 
