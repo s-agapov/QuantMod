@@ -118,11 +118,13 @@ if __name__ == "__main__":
     dfx = base[base["type"] == "shares"]
     dfx = dfx[dfx["cur"] == "rub"]
     base_ru = dfx.copy()
-
+    
+    import time
     res = []
     for ind, pos in base_ru.iterrows():
-    #    print(pos.figi)        
-        candles = tink.get_candles(token, pos.figi, CandleInterval.CANDLE_INTERVAL_DAY, 50)
+        time.sleep(1)
+        print(pos.figi, pos.ticker)        
+        candles = tink.get_candles(token, pos.figi, CandleInterval.CANDLE_INTERVAL_DAY, now(), 30)
         df =  tink.get_open_price(candles)
         ticker = tink.figi_to_ticker(pos.figi, base)
 
