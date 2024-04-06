@@ -21,6 +21,7 @@ from tinkoff.invest import OrderDirection, OrderType
 import sys
 sys.path.append("..") 
 from Portfolio.portfolio_tools import *
+from dataload import ReadData
 
 import tink_port as tink
 
@@ -88,6 +89,11 @@ def calculate_portfolio_difference(old_portfolio, new_portfolio):
 
     return sorted_diff
 
+def df_to_dict(dfx):
+    d = {row.ticker:row.lot_quantity for _,row in dfx.iterrows()}
+    sd = dict(sorted(d.items()))
+    return  sd
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
                         prog='Portfolio Rebalance',
@@ -108,33 +114,24 @@ if __name__ == "__main__":
     print("Количество аккаунтов:", len(accs.accounts))
 
     print(accs.accounts[0].name)
-    account_id = accs.accounts[0].id    
-##--------------------------------------------------
+    account_id = accs.accounts[0].id
+
+## ------- Read Tinkoff base
     base = tink.get_id_base(token)
-    port = tink.get_portfolio(token)
-    df_port = tink.port_to_df(port, base)
-##-------------------------------------------------
-    print("Скачиваю последние данные")
+
     dfx = base[base["type"] == "shares"]
     dfx = dfx[dfx["cur"] == "rub"]
     base_ru = dfx.copy()
-    
-    import time
-    res = []
-    for ind, pos in base_ru.iterrows():
-        time.sleep(1)
-        print(pos.figi, pos.ticker)        
-        candles = tink.get_candles(token, pos.figi, CandleInterval.CANDLE_INTERVAL_DAY, now(), 30)
-        df =  tink.get_open_price(candles)
-        ticker = tink.figi_to_ticker(pos.figi, base)
 
-        if ticker == None:
-            ticker = pos.figi
-        df.columns = [ticker]
-        res.append(df)
+## ------- Read current portfolio
+    port = tink.get_portfolio(token)
+    df_port = tink.port_to_df(port, base)
 
-        df_full = pd.concat(res, axis = 1)
-##----------------------------------------------------
+##---------- Read data from portfolio prices
+    reader = ReadData("")
+    df_full = reader.load('portfolio_prices.csv')
+
+    ##----------------------------------------------------
     with open('drops.json', 'r') as f:
         drops = json.load(f)
         
@@ -187,8 +184,6 @@ if __name__ == "__main__":
     dfx = dfx.reset_index()
     dfx.columns = ['ticker', 'weights', 'lot', 'price', 'lot_quantity','quantity', 'sums']
     
-    def df_to_dict(dfx):
-        return {row.ticker:row.lot_quantity for _, row in dfx.iterrows()}
 
     old_port = df_to_dict(df_port)
     new_port = df_to_dict(dfx)
@@ -206,51 +201,5 @@ if __name__ == "__main__":
             continue
 
         print(asset, qty)
-        
-##----------------------------------------
-    print("Размещение ордеров")
-    
 
-    residuals = []
-
-    with Client(token) as client:
-
-        for asset, qty in rebalance:
-            print(asset)
-            if asset is None:
-                continue
-
-            figi = tink.ticker_to_figi(asset, base)
-            trading_status = client.market_data.get_trading_status(
-                figi=figi
-            )
-
-            if trading_status.market_order_available_flag and trading_status.api_trade_available_flag:
-                if qty < 0:
-                    resp = client.orders.post_order(figi=figi,
-                                quantity= -qty,
-                                direction=OrderDirection.ORDER_DIRECTION_SELL,
-                                account_id=account_id,
-                                order_type=OrderType.ORDER_TYPE_MARKET,)
-                elif qty > 0:
-                    resp = client.orders.post_order(figi=figi,
-                        quantity=qty,
-                        direction=OrderDirection.ORDER_DIRECTION_BUY,
-                        account_id=account_id,
-                        order_type=OrderType.ORDER_TYPE_MARKET,)
-            else:
-                print("Не доступно")
-                residuals.append((asset, qty))
-
-##----------------------------------------------
-
-    print("Остатки:")
-
-    for asset, qty in residuals:
-        if asset is None:
-            continue
-
-        print(asset, qty)
-        
-##--------------------------------
     print("All Done")

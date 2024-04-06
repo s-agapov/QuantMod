@@ -54,7 +54,11 @@ class ReadData:
         with open(datapath, 'w') as f:
             self.df_port.to_csv(f)
     
-
+    def load(self, name):
+        prices_path = Path(TINK_DATA, name)
+        with open(prices_path) as f:
+            self.df_port = pd.read_csv(prices_path, index_col = 'date')
+        return self.df_port
 
 if __name__ == "__main__":
     data_reader = ReadData(ETF)

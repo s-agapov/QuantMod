@@ -103,6 +103,10 @@ def ticker_to_figi(ticker, df):
         return None
 
 def figi_to_ticker(figi, df):
+        ## Рубли
+    if figi == FIGI_RUB:
+        return "0-RUB"
+    
     dfx = df[df['figi'] == figi]   
  
     if dfx.shape[0] > 0 :
@@ -112,6 +116,7 @@ def figi_to_ticker(figi, df):
         return None
 
 def figi_to_name(figi, df):
+    
     dfx = df[df['figi'] == figi]   
  
     if dfx.shape[0] > 0 :
@@ -150,7 +155,23 @@ def get_candles(token, figi, interval, to_date, days):
                 if count == 4:
                     rerun = False
             
-        return res       
+        return res     
+    
+def get_price(candles, price:str):    
+    assert price in ["open", "high", "low", "close"]
+    res = []
+    for row in candles:
+        sdate = row[0]
+        sdate = sdate.strftime("%Y-%m-%d")
+        res.append([sdate] + row[1:])
+    df_full = pd.DataFrame(res, columns = ['date', 'open', 'high', 'low', 'close'])
+    
+    df = df_full[['date', price]]
+    df.columns =  ['date', 'ticker']
+    df = df.set_index('date')
+
+    
+    return df
     
 def get_open_price(candles):
     res = []
