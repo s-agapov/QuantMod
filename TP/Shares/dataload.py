@@ -1,29 +1,68 @@
 import pandas as pd
-import timk_port as tink
+from pathlib import Path
+from datetime import datetime
 
 from tinkoff.invest import CandleInterval, Client
 from tinkoff.invest.utils import now
 
+import sys
+sys.path.append("..")
+from tp_config import *
+import tink_port as tink
+
 ETF = 't.6nHltT1dYSfrVTIV9zF72fxDlB2sXJbRD6iJNpZXTFAN61rmD7m71xPp9ko12ta1JxA06em4YdN36xicnBmjWg'
 
 
-if __name__ == "__main__":
-    token = ETF
-    
-    base = tink.get_id_base(token)
-    dfx = base[base["type"] == "shares"]
-    dfx = dfx[dfx["cur"] == "rub"]
-    base_ru = dfx.copy()
+class ReadData:
+    def __init__(self, token: str):
+        self.token = token
+        self.base = []
+        self.candles = []
+        self.df_port = []
+        
+    def read_id_base(self):
+        base = tink.get_id_base(self.token)
+        dfx = base[base["type"] == "shares"]
+        dfx = dfx[dfx["cur"] == "rub"]
+        self.base = dfx.sort_values('ticker')
+     
+    def read_candles(self, days : int, verbose : bool = True):
+        res = []
+        for ind, pos in self.base.iterrows():
+            ticker = tink.figi_to_ticker(pos.figi, self.base)
+            print(ticker)
+            candles = tink.get_candles(self.token,
+                                       pos.figi,
+                                       CandleInterval.CANDLE_INTERVAL_DAY,
+                                       now(),
+                                       days)
+            res.append((ticker, candles))
+        self.candles = res
+        
+    def to_df(self):
+        res = []
+        for ticker, candles in self.candles:
+            df = tink.get_open_price(candles)
+            if ticker == None:
+                ticker = pos.figi
+            df.columns = [ticker]
+            res.append(df)
+        self.df_port = pd.concat(res, axis = 1)
 
-    res = []
-    for ind, pos in base_ru.iterrows():
-        candles = tink.get_candles(token, pos.figi, CandleInterval.CANDLE_INTERVAL_DAY, now(),  50)
-        df =  tink.get_open_price(candles)
-        ticker = tink.figi_to_ticker(pos.figi, base)
-        
-        if ticker == None:
-            ticker = pos.figi
-        df.columns = [ticker]
-        res.append(df)
-        
-    df_full = pd.concat(res, axis = 1)
+    def save(self, name):
+        datapath = Path(TINK_DATA, name)
+        with open(datapath, 'w') as f:
+            self.df_port.to_csv(f)
+    
+
+
+if __name__ == "__main__":
+    data_reader = ReadData(ETF)
+    data_reader.read_id_base()
+    data_reader.read_candles(50)
+    data_reader.to_df()
+    data_reader.save('portfolio_prices.csv')
+    
+    date = data_reader.df_port.iloc[-1].name
+    print("Last record:",  date)
+    
