@@ -1,16 +1,26 @@
 import numpy as np
 import pandas as pd
 
+import logging
+import os
+from datetime import timedelta
+from pathlib import Path
 import argparse
 import json
 
 import riskfolio as rp
 
+from tinkoff.invest import CandleInterval, Client
+from tinkoff.invest.utils import now
+from tinkoff.invest.caching.market_data_cache.cache import MarketDataCache
+from tinkoff.invest.caching.market_data_cache.cache_settings import (
+    MarketDataCacheSettings,
+)
+from tinkoff.invest import OrderDirection, OrderType
 
 import sys
 sys.path.append("..") 
 from Portfolio.portfolio_tools import *
-from dataload import ReadData
 
 import tink_port as tink
 
@@ -25,7 +35,7 @@ def riskfolio_weights(df_period, rm , obj):
 
     # Building the portfolio object
     port = rp.Portfolio(returns=Y)
- #   port.solvers = ['MOSEK']
+#    port.solvers = ['MOSEK']
     # Calculating optimum portfolio
 
     # Select method and estimate input parameters:
@@ -74,18 +84,10 @@ def calculate_portfolio_difference(old_portfolio, new_portfolio):
         if ticker not in new_portfolio:
             difference[ticker] = -old_portfolio[ticker]
     # Сортировка по значению, по возрастанию
-#    sorted_diff = sorted(difference.items(), key=lambda x: x[1])
-#    sorted_diff = {k:v for k,v in sorted_diff}
-    return difference
+    sorted_diff = sorted(difference.items(), key=lambda x: x[1])
 
-def df_to_dict(dfx):
-    d = {row.ticker:row.lot_quantity for _,row in dfx.iterrows()}
-    return d
-    
-def sort_dict(d):
-    sd = dict(sorted(d.items()))
-    return sd
-    
+    return sorted_diff
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
                         prog='Portfolio Rebalance',
@@ -106,24 +108,33 @@ if __name__ == "__main__":
     print("Количество аккаунтов:", len(accs.accounts))
 
     print(accs.accounts[0].name)
-    account_id = accs.accounts[0].id
-
-## ------- Read Tinkoff base
+    account_id = accs.accounts[0].id    
+##--------------------------------------------------
     base = tink.get_id_base(token)
-
+    port = tink.get_portfolio(token)
+    df_port = tink.port_to_df(port, base)
+##-------------------------------------------------
+    print("Скачиваю последние данные")
     dfx = base[base["type"] == "shares"]
     dfx = dfx[dfx["cur"] == "rub"]
     base_ru = dfx.copy()
+    
+    import time
+    res = []
+    for ind, pos in base_ru.iterrows():
+        time.sleep(1)
+        print(pos.figi, pos.ticker)        
+        candles = tink.get_candles(token, pos.figi, CandleInterval.CANDLE_INTERVAL_DAY, now(), 30)
+        df =  tink.get_open_price(candles)
+        ticker = tink.figi_to_ticker(pos.figi, base)
 
-## ------- Read current portfolio
-    port = tink.get_portfolio(token)
-    df_port = tink.port_to_df(port, base)
+        if ticker == None:
+            ticker = pos.figi
+        df.columns = [ticker]
+        res.append(df)
 
-##---------- Read data from portfolio prices
-    reader = ReadData("")
-    df_full = reader.load('portfolio_prices.csv')
-
-    ##----------------------------------------------------
+        df_full = pd.concat(res, axis = 1)
+##----------------------------------------------------
     with open('drops.json', 'r') as f:
         drops = json.load(f)
         
@@ -163,11 +174,11 @@ if __name__ == "__main__":
     inds = dfx.index.values.tolist()
 
     x = base_ru[base_ru['ticker'].isin (inds)]
-    dfx['lot'] = x[['ticker', 'lot']].set_index('ticker')
+    s = x[['ticker', 'lot']].set_index('ticker')
+    dfx['lot'] = s
     
     prices = dfp.iloc[-1].T.loc[dfx.index]
     dfx["price"] = prices
-
     dfx["lot_quantity"] = np.round(dfx.weights/ (dfx.price * dfx.lot)).astype(int)
     dfx["quantity"] =  dfx.lot * dfx.lot_quantity
     dfx["sum"]= dfx.price * dfx.lot_quantity * dfx.lot
@@ -175,74 +186,71 @@ if __name__ == "__main__":
     dfx.to_csv("t.csv")
     dfx = dfx.reset_index()
     dfx.columns = ['ticker', 'weights', 'lot', 'price', 'lot_quantity','quantity', 'sums']
+    
+    def df_to_dict(dfx):
+        return {row.ticker:row.lot_quantity for _, row in dfx.iterrows()}
 
-##-------------------Распределяем остаток суммы по всему портфелю------------------------
-    res_sum = sum_to_allocate - dfx.sums.sum()
-    print(res_sum)
-    res = []
-    for ind, row in dfx.iterrows():
-        qty = res_sum / row.price
-        lot_qty = np.round(qty / row.lot).astype(int)
-        pos_sum = lot_qty * row.lot * row.price
-        if res_sum >= pos_sum:
-            res.append(lot_qty)
-            res_sum = res_sum - pos_sum
-        else:
-            res.append(0)
-
-    dfx['add_lots'] = res
-    dfx.lot_quantity = dfx.lot_quantity + dfx.add_lots
-    dfx.quantity = dfx.lot_quantity * dfx.lot
-    dfx.sums = dfx.quantity * dfx.price
-
-    print()
-    print(f'Cумма старого и нового протфеля: {df_port.sums.sum():g}, {dfx.sums.sum():g}')
-##-------------------------------------------
     old_port = df_to_dict(df_port)
     new_port = df_to_dict(dfx)
-
-    print()
+        
     print("Старый портфель:")
-    print(sort_dict(old_port))
+    print(old_port)
     print("Новый портфель:")
-    print(sort_dict(new_port))
+    print(new_port)
     
-##-----------Рассчитываем позиции для корректировки портфеля---------------
-    print()
+##---------------------------------------------------------------
     print("Корректировка портфеля:")
     rebalance = calculate_portfolio_difference(old_port, new_port)
-    rebalance.pop("0-RUB")
-
-##-------------------Разделяем на продажу и покупку---------------
-##----------  Часть покупки отсортирована по важности позиций
-    sd = sorted(rebalance.items(), key=lambda x: x[1])
-    sorted_rebalance = {k:v for k,v in sd}
-    for asset in sorted_rebalance:
-        qty = rebalance[asset]
-        if asset is None  :
+    for asset, qty in rebalance:
+        if asset is None:
             continue
+
         print(asset, qty)
         
-    sell_part = {}
-    buy_part  = {}
-    for asset in rebalance:
-        qty = rebalance[asset]
-        if asset is None  :
+##----------------------------------------
+    print("Размещение ордеров")
+    
+
+    residuals = []
+
+    with Client(token) as client:
+
+        for asset, qty in rebalance:
+            print(asset)
+            if asset is None:
+                continue
+
+            figi = tink.ticker_to_figi(asset, base)
+            trading_status = client.market_data.get_trading_status(
+                figi=figi
+            )
+
+            if trading_status.market_order_available_flag and trading_status.api_trade_available_flag:
+                if qty < 0:
+                    resp = client.orders.post_order(figi=figi,
+                                quantity= -qty,
+                                direction=OrderDirection.ORDER_DIRECTION_SELL,
+                                account_id=account_id,
+                                order_type=OrderType.ORDER_TYPE_MARKET,)
+                elif qty > 0:
+                    resp = client.orders.post_order(figi=figi,
+                        quantity=qty,
+                        direction=OrderDirection.ORDER_DIRECTION_BUY,
+                        account_id=account_id,
+                        order_type=OrderType.ORDER_TYPE_MARKET,)
+            else:
+                print("Не доступно")
+                residuals.append((asset, qty))
+
+##----------------------------------------------
+
+    print("Остатки:")
+
+    for asset, qty in residuals:
+        if asset is None:
             continue
-    
-        if qty < 0:
-            sell_part[asset] = qty
-        elif qty >0:
-            buy_part[asset] = qty
-    
-    with open('rebalance.json', 'w') as f:
-        json.dump(rebalance, f)
 
-    with open('rebalance_sell.json', 'w') as f:
-        json.dump(sell_part, f)
+        print(asset, qty)
         
-    with open('rebalance_buy.json', 'w') as f:
-        json.dump(buy_part, f)
-
-    print()
+##--------------------------------
     print("All Done")
