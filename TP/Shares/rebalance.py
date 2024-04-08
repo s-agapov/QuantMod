@@ -1,22 +1,11 @@
 import numpy as np
 import pandas as pd
 
-import logging
-import os
-from datetime import timedelta
-from pathlib import Path
 import argparse
 import json
 
 import riskfolio as rp
 
-from tinkoff.invest import CandleInterval, Client
-from tinkoff.invest.utils import now
-from tinkoff.invest.caching.market_data_cache.cache import MarketDataCache
-from tinkoff.invest.caching.market_data_cache.cache_settings import (
-    MarketDataCacheSettings,
-)
-from tinkoff.invest import OrderDirection, OrderType
 
 import sys
 sys.path.append("..") 
@@ -86,7 +75,7 @@ def calculate_portfolio_difference(old_portfolio, new_portfolio):
             difference[ticker] = -old_portfolio[ticker]
     # Сортировка по значению, по возрастанию
     sorted_diff = sorted(difference.items(), key=lambda x: x[1])
-
+    sorted_diff = {k:v for k,v in sorted_diff}
     return sorted_diff
 
 def df_to_dict(dfx):
@@ -171,11 +160,11 @@ if __name__ == "__main__":
     inds = dfx.index.values.tolist()
 
     x = base_ru[base_ru['ticker'].isin (inds)]
-    s = x[['ticker', 'lot']].set_index('ticker')
-    dfx['lot'] = s
+    dfx['lot'] = x[['ticker', 'lot']].set_index('ticker')
     
     prices = dfp.iloc[-1].T.loc[dfx.index]
     dfx["price"] = prices
+
     dfx["lot_quantity"] = np.round(dfx.weights/ (dfx.price * dfx.lot)).astype(int)
     dfx["quantity"] =  dfx.lot * dfx.lot_quantity
     dfx["sum"]= dfx.price * dfx.lot_quantity * dfx.lot
@@ -183,23 +172,52 @@ if __name__ == "__main__":
     dfx.to_csv("t.csv")
     dfx = dfx.reset_index()
     dfx.columns = ['ticker', 'weights', 'lot', 'price', 'lot_quantity','quantity', 'sums']
-    
 
+##-------------------Распределяем остаток суммы по всему портфелю------------------------
+    res_sum = sum_to_allocate - dfx.sums.sum()
+    print(res_sum)
+    res = []
+    for ind, row in dfx.iterrows():
+        qty = res_sum / row.price
+        lot_qty = np.round(qty / row.lot).astype(int)
+        pos_sum = lot_qty * row.lot * row.price
+        if res_sum >= pos_sum:
+            res.append(lot_qty)
+            res_sum = res_sum - pos_sum
+        else:
+            res.append(0)
+
+    dfx['add_lots'] = res
+    dfx.lot_quantity = dfx.lot_quantity + dfx.add_lots
+    dfx.quantity = dfx.lot_quantity * dfx.lot
+    dfx.sums = dfx.quantity * dfx.price
+
+    print()
+    print(f'Cумма старого и нового протфеля: {df_port.sums.sum():g}, {dfx.sums.sum():g}')
+##-------------------------------------------
     old_port = df_to_dict(df_port)
     new_port = df_to_dict(dfx)
-        
+
+    print()
     print("Старый портфель:")
     print(old_port)
     print("Новый портфель:")
     print(new_port)
     
 ##---------------------------------------------------------------
+    print()
     print("Корректировка портфеля:")
     rebalance = calculate_portfolio_difference(old_port, new_port)
-    for asset, qty in rebalance:
+    rebalance.pop("0-RUB")
+    for asset in rebalance:
+        qty = rebalance[asset]
         if asset is None:
             continue
 
         print(asset, qty)
 
+
     print("All Done")
+
+    with open('rebalance.json', 'w') as f:
+        json.dump(rebalance, f)
