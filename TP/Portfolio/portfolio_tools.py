@@ -47,7 +47,7 @@ def weights_to_df(cleaned_weights):
     return dfw
 
 def final_sums(df, total, filt):
-    xx = round(df * total, -1)
+    xx = round(df * total, 1)
     return xx[xx['weights'] > filt]
 
 

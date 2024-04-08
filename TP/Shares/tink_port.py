@@ -132,7 +132,7 @@ def money_value(price):
 def get_candles(token, figi, interval, to_date, days):
     res = []
     with Client(token) as client:
-        settings = MarketDataCacheSettings(base_cache_dir=Path(TINK_DATA))
+        settings = MarketDataCacheSettings(base_cache_dir=Path(TINK_DATA, 'Cache'))
         market_data_cache = MarketDataCache(settings=settings, services=client)
         count = 0
         rerun = True
