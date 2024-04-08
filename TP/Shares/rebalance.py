@@ -81,7 +81,7 @@ def calculate_portfolio_difference(old_portfolio, new_portfolio):
 def df_to_dict(dfx):
     d = {row.ticker:row.lot_quantity for _,row in dfx.iterrows()}
     sd = dict(sorted(d.items()))
-    return  sd
+    return sd
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
