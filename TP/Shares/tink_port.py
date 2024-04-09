@@ -15,7 +15,7 @@ import sys
 sys.path.append("..")
 from tp_config import *
 
-class TinkPortfolio:
+class TinkSession:
     def __init__(self, Client, token):
         self.Client = Client
         self.token = token
