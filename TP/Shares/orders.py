@@ -28,6 +28,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('portfolio', choices=['sandbox', 'momentum']) 
 
 
+
 args = parser.parse_args()
 if  args.portfolio == 'sandbox':
     token = SANDBOX        
@@ -107,7 +108,6 @@ if my_file.is_file():
 
         for asset in rebalance_buy:
             qty = rebalance_buy[asset]
-            print(asset, qty)
             if asset is None:
                 continue
 
