@@ -65,7 +65,7 @@ if __name__ == "__main__":
     shutil.rmtree(Path(TINK_DATA, 'Cache'))
     data_reader = ReadData(ETF)
     data_reader.read_id_base()
-    data_reader.read_candles(50)
+    data_reader.read_candles(90)
     data_reader.to_df()
     data_reader.save('portfolio_prices.csv')
 

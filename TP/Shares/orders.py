@@ -25,7 +25,7 @@ parser = argparse.ArgumentParser(
                     description='Rebalance Portfolio On Thinkoff API',
                     epilog='')
 
-parser.add_argument('portfolio', choices=['sandbox', 'momentum']) 
+parser.add_argument('portfolio', choices=['sandbox', 'momentum', 'base']) 
 
 
 

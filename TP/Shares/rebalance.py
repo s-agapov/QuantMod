@@ -12,10 +12,16 @@ sys.path.append("..")
 from Portfolio.portfolio_tools import *
 from dataload import ReadData
 
+from tinkoff.invest import  Client
+from tinkoff.invest.sandbox.client import SandboxClient
 import tink_port as tink
 
 BASE = 't.UFRJ8SC9hafVOhFxEUY7yf1wZ1gGhwJp-WCp9o4rnEChHWns0c3jQ21eQwoOW_RurFqeZpss2scJkmMQnomJ9g'
 MOMENTUM = 't.24WV5_MMG1bQArK1WPp1_DYWD52f-VfGjpR1ci5Pqf0PJ948zWhDstoO_6d4wXIhFTMVsVJSgOzPElUIPEO4Mw'
+SANDBOX = 't.qTfMeDk8iM5GLjIGj5Q5DVSnGdvOmSOzG4r3jQqdkdE2YUJMtFvBNb4v-Tyr50-4rxPBqia2jT-kBsE4NtoiKw'
+
+
+sandbox_account_id = "ebed5b2d-8ff8-4ea7-be10-295f78939cf0"
 
 def riskfolio_weights(df_period, rm , obj):
     """
@@ -92,17 +98,25 @@ if __name__ == "__main__":
                         description='Rebalance Portfolio On Thinkoff API',
                         epilog='')
     
-    parser.add_argument('portfolio', choices=['base', 'momentum']) 
+    parser.add_argument('portfolio', choices=['sandbox', 'base', 'momentum']) 
+    parser.add_argument('-l','--lookback',  default=30, type=int,
+              help='Lookback period', nargs='?')
     
     args = parser.parse_args()
     if args.portfolio == 'base':
         token = BASE
+        WorkClient = Client
     elif args.portfolio == 'momentum':
         token = MOMENTUM
-
+        WorkClient = Client
+    elif args.portfolio == 'sandbox':
+        token = SANDBOX
+        WorkClient = SandboxClient
     
 ## ------------------------------------------------        
-    accs = tink.get_accounts(token)
+    sess = tink.TinkSession(WorkClient, token)
+    
+    accs = sess.get_accounts()
     print("Количество аккаунтов:", len(accs.accounts))
 
     print(accs.accounts[0].name)
@@ -147,7 +161,7 @@ if __name__ == "__main__":
     print("Расчет портфеля")
     print()
     
-    lookback = 30
+    lookback = args.lookback
     df_period = dfp[-lookback:]
 
     #print_data(dfp)
