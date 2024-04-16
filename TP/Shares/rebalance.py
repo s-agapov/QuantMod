@@ -130,7 +130,7 @@ if __name__ == "__main__":
     base_ru = dfx.copy()
 
 ## ------- Read current portfolio
-    port = tink.get_portfolio(token)
+    port = sess.get_portfolio()
     df_port = tink.port_to_df(port, base)
 
 ##---------- Read data from portfolio prices
@@ -140,7 +140,7 @@ if __name__ == "__main__":
     ##----------------------------------------------------
     with open('drops.json', 'r') as f:
         drops = json.load(f)
-        
+
     if args.portfolio == 'base':
         dfp = df_full.copy()
         index_assets = pd.read_csv('index_assets.csv')['asset'].values.tolist()
@@ -150,13 +150,23 @@ if __name__ == "__main__":
         columns = [x for x in columns if x not in drops]
 
         dfp = dfp[columns]
-    
-    if args.portfolio == 'momentum':
+    elif args.portfolio == 'momentum':
         dfp = df_full.copy()
         drops = drops['momentum']
         columns = [x for x in dfp.columns if x not in drops]
         dfp = dfp[columns]
+    elif args.portfolio == 'sandbox':
+        dfp = df_full.copy()
+        index_assets = pd.read_csv('index_assets.csv')['asset'].values.tolist()
+        columns = [x for x in dfp.columns if x in index_assets]
 
+        drops = drops['base']
+        columns = [x for x in columns if x not in drops]
+
+        dfp = dfp[columns]
+    else:
+        raise Exception("Unknown portfolio")
+        
 ##-------------------------------------------------------------
     print("Расчет портфеля")
     print()
