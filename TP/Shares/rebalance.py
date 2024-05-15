@@ -235,7 +235,10 @@ if __name__ == "__main__":
     print()
     print("Корректировка портфеля:")
     rebalance = calculate_portfolio_difference(old_port, new_port)
-    rebalance.pop("0-RUB")
+    try:
+        rebalance.pop("0-RUB")
+    except:
+        pass
 
 ##-------------------Разделяем на продажу и покупку---------------
 ##----------  Часть покупки отсортирована по важности позиций

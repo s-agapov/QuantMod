@@ -31,7 +31,8 @@ class ReadData:
         res = []
         for ind, pos in self.base.iterrows():
             ticker = tink.figi_to_ticker(pos.figi, self.base)
-            print(ticker)
+            if verbose:
+                print(ticker)
             candles = tink.get_candles(self.token,
                                        pos.figi,
                                        CandleInterval.CANDLE_INTERVAL_DAY,
