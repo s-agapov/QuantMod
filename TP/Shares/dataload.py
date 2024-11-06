@@ -11,7 +11,7 @@ sys.path.append("..")
 from tp_config import TINK_DATA
 import tink_port as tink
 
-ETF = 't.6nHltT1dYSfrVTIV9zF72fxDlB2sXJbRD6iJNpZXTFAN61rmD7m71xPp9ko12ta1JxA06em4YdN36xicnBmjWg'
+TOKEN = 't.6nHltT1dYSfrVTIV9zF72fxDlB2sXJbRD6iJNpZXTFAN61rmD7m71xPp9ko12ta1JxA06em4YdN36xicnBmjWg'
 
 
 class ReadData:
@@ -63,12 +63,25 @@ class ReadData:
 
 if __name__ == "__main__":
 
-    shutil.rmtree(Path(TINK_DATA, 'Cache'))
-    data_reader = ReadData(ETF)
-    data_reader.read_id_base()
-    data_reader.read_candles(90)
-    data_reader.to_df()
-    data_reader.save('portfolio_prices.csv')
+    data_path = Path(TINK_DATA, 'Cache')
+    if data_path.is_dir():
+        shutil.rmtree()
 
-    date = data_reader.df_port.iloc[-1].name
-    print("Last record:", date)
+    # Тестируем доступность подключения
+    with Client(TOKEN) as client:
+        try:
+            client.users.get_info()
+            connect = True
+        except:
+            print("Ошибка подключения!")
+            connect = False
+            
+    if connect:  
+        data_reader = ReadData(TOKEN)
+        data_reader.read_id_base()
+        data_reader.read_candles(90)
+        data_reader.to_df()
+        data_reader.save('portfolio_prices.csv')
+    
+        date = data_reader.df_port.iloc[-1].name
+        print("Last record:", date)
