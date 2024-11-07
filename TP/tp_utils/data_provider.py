@@ -237,3 +237,25 @@ def load_data_from_exchange(exchange, markets, timeframes, start_timestamp, data
     print('Done')
     time_taken = (time.time() - start_time)/60/60
     print("Time taken = {0:.3f}".format(time_taken),' hours')
+    
+def load_data_for_portfolio(tickers, tf, verbose = True):
+    res = []
+    for ticker in tickers:
+        if verbose:
+            print(ticker)
+        df = read_data(ticker, tf)
+        if df.shape[0] > 0:
+            df = df.drop_duplicates(subset=['T'])
+            df.index = df['T']
+            df_close = df[['C']]
+            df_close.columns = [ticker]
+            res.append(df_close)
+        else:
+            print(ticker, "Нет данных")
+
+    df1 = res[0]
+    for df2 in res[1:]:
+        #df1 = df1.join(df2, how='inner', on= 'T')
+        df1 = pd.merge_asof(df1, df2, on= 'T', tolerance = 1)
+    df_prices = df1.set_index('T') 
+    return df_prices

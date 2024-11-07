@@ -32,17 +32,25 @@ class TinkSession:
             port = cl.operations.get_portfolio(account_id=acc_id) 
         return port
 
-def get_accounts(token):
-    with Client(token) as cl:
-        accounts = cl.users.get_accounts()
-    return accounts
-
-def get_portfolio(token):
-    accounts = get_accounts(token)
-    acc_id = accounts.accounts[0].id
-    with Client(token) as cl:
-        port = cl.operations.get_portfolio(account_id=acc_id) 
-    return port
+    def get_id_base(self):
+        with self.Client(self.token) as cl:
+            instruments = cl.instruments
+            market_data = cl.market_data
+        
+            l = []
+            for method in ['shares', 'currencies', 'futures', 'bonds']:
+                for item in getattr(instruments, method)().instruments:
+                    l.append({
+                        'ticker': item.ticker,
+                        'figi': item.figi,
+                        'type': method,
+                        'name': item.name,
+                        'cur' : item.currency,
+                        'lot' : item.lot
+                    })
+        
+            df = pd.DataFrame(l)
+        return df
 
 
 def get_asset_lot(figi, df):
@@ -74,25 +82,7 @@ def port_to_df(port, base):
     df_port = df_port.sort_values("ticker")    
     return df_port
 
-def get_id_base(token):
-    with Client(token) as cl:
-        instruments = cl.instruments
-        market_data = cl.market_data
-    
-        l = []
-        for method in ['shares', 'currencies', 'futures', 'bonds', 'etfs']:
-            for item in getattr(instruments, method)().instruments:
-                l.append({
-                    'ticker': item.ticker,
-                    'figi': item.figi,
-                    'type': method,
-                    'name': item.name,
-                    'cur' : item.currency,
-                    'lot' : item.lot
-                })
-    
-        df = pd.DataFrame(l)
-    return df
+
 
 def ticker_to_figi(ticker, df):
     dfx = df[df['ticker'] == ticker]   
@@ -129,9 +119,9 @@ def figi_to_name(figi, df):
 def money_value(price):
     return price.units + price.nano / 1e9
 
-def get_candles(token, figi, interval, to_date, days):
-    res = []
-    with Client(token) as client:
+def get_candles(Cl, figi, interval, to_date, days):
+    with Cl as client:
+        res = []
         settings = MarketDataCacheSettings(base_cache_dir=Path(TINK_DATA, 'Cache'))
         market_data_cache = MarketDataCache(settings=settings, services=client)
         count = 0
@@ -151,7 +141,7 @@ def get_candles(token, figi, interval, to_date, days):
             except:
                 count = count + 1
                 print("Ошибка связи")
-                tim.sleep(2)
+                time.sleep(2)
                 if count == 4:
                     rerun = False
             

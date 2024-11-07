@@ -2,6 +2,7 @@ import json
 import os
 import argparse
 from pathlib import Path
+import yaml
 
 from tinkoff.invest import  Client
 from tinkoff.invest import OrderDirection, OrderType
@@ -10,14 +11,11 @@ from tinkoff.invest.sandbox.client import SandboxClient
 
 import tink_port as tink
 
+with open('settings.yaml') as f:
+    # Load YAML data from the file
+    config = yaml.load(f, Loader=yaml.FullLoader)
 
-BASE = 't.UFRJ8SC9hafVOhFxEUY7yf1wZ1gGhwJp-WCp9o4rnEChHWns0c3jQ21eQwoOW_RurFqeZpss2scJkmMQnomJ9g'
-MOMENTUM = 't.24WV5_MMG1bQArK1WPp1_DYWD52f-VfGjpR1ci5Pqf0PJ948zWhDstoO_6d4wXIhFTMVsVJSgOzPElUIPEO4Mw'
-SANDBOX = 't.qTfMeDk8iM5GLjIGj5Q5DVSnGdvOmSOzG4r3jQqdkdE2YUJMtFvBNb4v-Tyr50-4rxPBqia2jT-kBsE4NtoiKw'
-
-
-account_id = "ebed5b2d-8ff8-4ea7-be10-295f78939cf0"
-
+sandbox_account_id = config["sandbox_account"]
 
 
 parser = argparse.ArgumentParser(
@@ -30,15 +28,15 @@ parser.add_argument('portfolio', choices=['sandbox', 'momentum', 'base'])
 
 
 args = parser.parse_args()
-if  args.portfolio == 'sandbox':
-    token = SANDBOX        
-    WorkClient = SandboxClient
-elif args.portfolio == 'base':
-    token = BASE
+if args.portfolio == 'base':
+    token = config["base"]
     WorkClient = Client
 elif args.portfolio == 'momentum':
-    token = MOMENTUM
+    token = config["momentum"]
     WorkClient = Client
+elif args.portfolio == 'sandbox':
+    token = config["sandbox"]
+    WorkClient = SandboxClient
 
 sess = tink.TinkSession(WorkClient, token)
     
@@ -47,10 +45,11 @@ print("Количество аккаунтов:", len(accs.accounts))
 
 print(accs.accounts[0].name)
 account_id = accs.accounts[0].id
+
 print("Account id:", account_id)
 
 
-base = tink.get_id_base(token)
+base = sess.get_id_base()
 dfx = base[base["type"] == "shares"]
 dfx = dfx[dfx["cur"] == "rub"]
 base_ru = dfx.copy()

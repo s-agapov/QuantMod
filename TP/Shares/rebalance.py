@@ -3,6 +3,7 @@ import pandas as pd
 
 import argparse
 import json
+import yaml
 
 import riskfolio as rp
 
@@ -16,12 +17,12 @@ from tinkoff.invest import  Client
 from tinkoff.invest.sandbox.client import SandboxClient
 import tink_port as tink
 
-BASE = 't.UFRJ8SC9hafVOhFxEUY7yf1wZ1gGhwJp-WCp9o4rnEChHWns0c3jQ21eQwoOW_RurFqeZpss2scJkmMQnomJ9g'
-MOMENTUM = 't.24WV5_MMG1bQArK1WPp1_DYWD52f-VfGjpR1ci5Pqf0PJ948zWhDstoO_6d4wXIhFTMVsVJSgOzPElUIPEO4Mw'
-SANDBOX = 't.qTfMeDk8iM5GLjIGj5Q5DVSnGdvOmSOzG4r3jQqdkdE2YUJMtFvBNb4v-Tyr50-4rxPBqia2jT-kBsE4NtoiKw'
 
+with open('settings.yaml') as f:
+    # Load YAML data from the file
+    config = yaml.load(f, Loader=yaml.FullLoader)
 
-sandbox_account_id = "ebed5b2d-8ff8-4ea7-be10-295f78939cf0"
+sandbox_account_id = config["sandbox_account"]
 
 def riskfolio_weights(df_period, rm , obj):
     """
@@ -39,7 +40,7 @@ def riskfolio_weights(df_period, rm , obj):
     method_mu='hist' # Method to estimate expected returns based on historical data.
     method_cov='hist' # Method to estimate covariance matrix based on historical data.
 
-    port.assets_stats(method_mu=method_mu, method_cov=method_cov, d=0.94)
+    port.assets_stats(method_mu=method_mu, method_cov=method_cov)
 
     # Estimate optimal portfolio:
 
@@ -99,42 +100,42 @@ if __name__ == "__main__":
                         epilog='')
     
     parser.add_argument('portfolio', choices=['sandbox', 'base', 'momentum']) 
-    parser.add_argument('-l','--lookback',  default=30, type=int,
-              help='Lookback period', nargs='?')
+    parser.add_argument('-l','--lookback',  default=30, type=int, help='Lookback period', nargs='?')
+    parser.add_argument('-v','--verbose',  default=False, type=bool, help='Print debug info', nargs='?')
     
     args = parser.parse_args()
     if args.portfolio == 'base':
-        token = BASE
+        token = config["base"]
         WorkClient = Client
     elif args.portfolio == 'momentum':
-        token = MOMENTUM
+        token = config["momentum"]
         WorkClient = Client
     elif args.portfolio == 'sandbox':
-        token = SANDBOX
+        token = config["sandbox"]
         WorkClient = SandboxClient
     
 ## ------------------------------------------------        
-    sess = tink.TinkSession(WorkClient, token)
+    ts = tink.TinkSession(WorkClient, token)
     
-    accs = sess.get_accounts()
+    accs = ts.get_accounts()
     print("Количество аккаунтов:", len(accs.accounts))
 
     print(accs.accounts[0].name)
     account_id = accs.accounts[0].id
 
 ## ------- Read Tinkoff base
-    base = tink.get_id_base(token)
+    base = ts.get_id_base()
 
     dfx = base[base["type"] == "shares"]
     dfx = dfx[dfx["cur"] == "rub"]
     base_ru = dfx.copy()
 
 ## ------- Read current portfolio
-    port = sess.get_portfolio()
+    port = ts.get_portfolio()
     df_port = tink.port_to_df(port, base)
 
 ##---------- Read data from portfolio prices
-    reader = ReadData("")
+    reader = ReadData(WorkClient, token)
     df_full = reader.load('portfolio_prices.csv')
 
     ##----------------------------------------------------
@@ -157,12 +158,8 @@ if __name__ == "__main__":
         dfp = dfp[columns]
     elif args.portfolio == 'sandbox':
         dfp = df_full.copy()
-        index_assets = pd.read_csv('index_assets.csv')['asset'].values.tolist()
-        columns = [x for x in dfp.columns if x in index_assets]
-
-        drops = drops['base']
-        columns = [x for x in columns if x not in drops]
-
+        drops = drops['momentum']
+        columns = [x for x in dfp.columns if x not in drops]
         dfp = dfp[columns]
     else:
         raise Exception("Unknown portfolio")
@@ -179,13 +176,28 @@ if __name__ == "__main__":
 
     dfw = riskfolio_weights(df_period, 'CVaR', 'MaxRet')
 
+    verbose = args.verbose
+    if verbose:
+        print("Расчитанные веса:")
+        print(dfw)
 ##-------------------------------------------------------------
+    # Для учета 0-RUB, рубли, у них price == 0
+    df_port["price"]= df_port["price"].replace(to_replace = 0, value = 1,)
     df_port['sums'] = df_port.quantity * df_port.price
+    if verbose:
+        print(df_port)
+
     sum_to_allocate = df_port.sums.sum() - 500
+    if verbose:
+        print("Сумма к распределению", sum_to_allocate)    
+
     dfx = final_sums(dfw, sum_to_allocate, 100)
     dfx['lot'] = 1
     inds = dfx.index.values.tolist()
-
+    if verbose:
+        print("Веса с суммами:")
+        print(dfx)
+    
     x = base_ru[base_ru['ticker'].isin (inds)]
     dfx['lot'] = x[['ticker', 'lot']].set_index('ticker')
     
@@ -202,7 +214,8 @@ if __name__ == "__main__":
 
 ##-------------------Распределяем остаток суммы по всему портфелю------------------------
     res_sum = sum_to_allocate - dfx.sums.sum()
-    print(res_sum)
+    if verbose:
+        print(f"Остаток суммы к распределению: {res_sum:f.2}")
     res = []
     for ind, row in dfx.iterrows():
         qty = res_sum / row.price

@@ -1,9 +1,11 @@
 import pandas as pd
 from pathlib import Path
 import shutil
-
+import argparse
+import yaml
 
 from tinkoff.invest import CandleInterval, Client
+from tinkoff.invest.sandbox.client import SandboxClient
 from tinkoff.invest.utils import now
 
 import sys
@@ -11,18 +13,21 @@ sys.path.append("..")
 from tp_config import TINK_DATA
 import tink_port as tink
 
-TOKEN = 't.6nHltT1dYSfrVTIV9zF72fxDlB2sXJbRD6iJNpZXTFAN61rmD7m71xPp9ko12ta1JxA06em4YdN36xicnBmjWg'
 
-
+with open('settings.yaml') as f:
+    # Load YAML data from the file
+    tokens = yaml.load(f, Loader=yaml.FullLoader)
+    
 class ReadData:
-    def __init__(self, token: str):
+    def __init__(self, Cl, token):
+        self.Client = Cl 
         self.token = token
         self.base = []
         self.candles = []
         self.df_port = []
 
     def read_id_base(self):
-        base = tink.get_id_base(self.token)
+        base = tink.get_id_base(self.Client(self.token))
         dfx = base[base["type"] == "shares"]
         dfx = dfx[dfx["cur"] == "rub"]
         self.base = dfx.sort_values('ticker')
@@ -33,7 +38,7 @@ class ReadData:
             ticker = tink.figi_to_ticker(pos.figi, self.base)
             if verbose:
                 print(ticker)
-            candles = tink.get_candles(self.token,
+            candles = tink.get_candles(self.Client(self.token),
                                        pos.figi,
                                        CandleInterval.CANDLE_INTERVAL_DAY,
                                        now(),
@@ -62,22 +67,33 @@ class ReadData:
 
 
 if __name__ == "__main__":
-
-    data_path = Path(TINK_DATA, 'Cache')
-    if data_path.is_dir():
-        shutil.rmtree()
+    parser = argparse.ArgumentParser(
+                    prog='Download data from Tinkoff',
+                    description='Download data from Thinkoff API',
+                    epilog='')
+    
+    parser.add_argument('portfolio', choices=['sandbox', 'momentum']) 
+    
+    args = parser.parse_args()
+    match args.portfolio:
+        case 'momentum':
+            token = tokens['momentum']
+            WorkClient = Client
+        case 'sandbox':
+            token = tokens['sandbox']
+            WorkClient = SandboxClient
 
     # Тестируем доступность подключения
-    with Client(TOKEN) as client:
+    with WorkClient(token) as client:
         try:
             client.users.get_info()
             connect = True
         except:
-            print("Ошибка подключения!")
+            print("Ошибка подключения! Проверьте токен доступа к API")
             connect = False
             
     if connect:  
-        data_reader = ReadData(TOKEN)
+        data_reader = ReadData(WorkClient, token)
         data_reader.read_id_base()
         data_reader.read_candles(90)
         data_reader.to_df()
