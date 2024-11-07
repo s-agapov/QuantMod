@@ -27,7 +27,8 @@ class ReadData:
         self.df_port = []
 
     def read_id_base(self):
-        base = tink.get_id_base(self.Client(self.token))
+        ts = tink.TinkSession(self.Client, self.token)
+        base = ts.get_id_base()
         dfx = base[base["type"] == "shares"]
         dfx = dfx[dfx["cur"] == "rub"]
         self.base = dfx.sort_values('ticker')
