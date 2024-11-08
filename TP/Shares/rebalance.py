@@ -4,6 +4,7 @@ import pandas as pd
 import argparse
 import json
 import yaml
+from datetime import datetime
 
 import riskfolio as rp
 
@@ -165,7 +166,8 @@ if __name__ == "__main__":
         raise Exception("Unknown portfolio")
         
 ##-------------------------------------------------------------
-    print("Расчет портфеля")
+
+    print("Расчет портфеля:", datetime.now().strftime("%Y-%m-%d %H:%M"))
     print()
     
     lookback = args.lookback

@@ -1,8 +1,8 @@
 #!/bin/bash
-
-source ~/anaconda3/bin/activate quant #correct
+PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+source /home/samsmu/anaconda3/bin/activate quant #correct
 #python Documents/my_python_file_name.py WRONG SEPARATLY GO TO FOLER WHTAN EXECUTE EITH python
-cd ~/Code/Learn/QuantMod/TP/Shares/ #correct
+cd /home/samsmu/Code/Learn/QuantMod/TP/Shares/ #correct
 python dataload.py sandbox #correct
 python rebalance.py sandbox #correct
 python orders.py sandbox #correct
